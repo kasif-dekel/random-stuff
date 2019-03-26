@@ -1,3 +1,5 @@
+// PLEASE READ:
+
 // not complete and might be buggy - work in progress (when i get time)
 // still need to support x86 and ARM 
 // please excuse my java programming :)
@@ -284,7 +286,7 @@ public class ParseX64SEHDirectory extends GhidraScript {
 				int code_count = ui.count_of_codes;
 				
 				scopeaddr = unwind_header.add(4 + (code_count * 2));
-				scopeaddr = scopeaddr.add(scopeaddr.getUnsignedOffset() % 4); //verify this shit..
+				scopeaddr = scopeaddr.add(scopeaddr.getUnsignedOffset() % 4); 
 				
 				if(memory.getBytes(scopeaddr, sehentry) != SCOPE_ENTRY_HEADER.SCOPE_ENTRY_HEADER_SIZE) { 
 					System.out.println("awful shit just happened");
