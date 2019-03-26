@@ -331,8 +331,7 @@ public class ParseX64SEHDirectory extends GhidraScript {
 					disassemble(baseAddr.add(se.target));
 					setPostComment(baseAddr.add(se.target), "SEH Handler");
 					setPreComment(baseAddr.add(se.begin), "try { //handler: " + baseAddr.add(se.target).toString());
-					setEOLComment(baseAddr.add(se.end), "} //handler: " + baseAddr.add(se.target).toString());
-					
+					setPreComment(baseAddr.add(se.end), "} //handler: " + baseAddr.add(se.target).toString());
 				}
 				
 
