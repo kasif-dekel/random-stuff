@@ -314,7 +314,7 @@ public class ParseX64SEHDirectory extends GhidraScript {
 					continue;
 				}
 				
-				if(!fnc.getName().contains("C_specific_handler") && !fnc.getName().contains("GSHandlerCheck_SEH")) { 
+				if(!fnc.getName().contains("C_specific_handler") && !fnc.getName().contains("GSHandlerCheck")) { 
 					continue;
 				}
 				
