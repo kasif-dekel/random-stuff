@@ -4,12 +4,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Observable;
 import javax.swing.*;
+
+import org.apache.commons.io.IOUtils;
 
 import docking.widgets.EmptyBorderButton;
 import ghidra.app.plugin.core.instructionsearch.InstructionSearchPlugin;
@@ -150,7 +153,7 @@ public class VTgrepGHIDRA extends GhidraScript {
 				
 				String toURL = sanitize(reduce_query(currentSTR));
 				
-				println("DEBUG: toURL: " + toURL); //TOOD: remove
+				println("DEBUG: toURL: " + toURL); //TODO: remove
 				
 				if(toURL.length() < MIN_QUERY_LEN || toURL.length() > MAX_QUERY_LEN) { 
 					popup("Error! minimum bytes query length should be at least 5 and below 2048!");
@@ -234,6 +237,68 @@ public class VTgrepGHIDRA extends GhidraScript {
 
 		}
 		
+		private class CertAction extends AbstractAction {
+			InstructionTable instructionTable;
+			public CertAction(String text, Icon icon, String desc, InstructionTable instructionTable) {
+				super(text, icon);
+				putValue(SHORT_DESCRIPTION, desc);
+				this.instructionTable = instructionTable;
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				check_cert();
+				
+				InstructionTableModel model = (InstructionTableModel) this.instructionTable.getModel();
+				model.fireTableDataChanged();
+			}
+
+		}
+		
+		public void check_cert() { 
+			String path = currentProgram.getExecutablePath();
+			String stdout = "";
+			String stderr = "";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) {
+				File f = new File(path);
+				if(!f.exists()) { //for whatever reason :)
+				    popup("Something went wrong while processing this file");
+				    return;
+				}
+				String command = "powershell.exe (Get-AuthenticodeSignature '"+f.getPath()+"').SignerCertificate.Thumbprint";
+				Process powerShellProcess;
+				try {
+					powerShellProcess = Runtime.getRuntime().exec(command);
+					powerShellProcess.getOutputStream().close();
+					stdout = IOUtils.toString(powerShellProcess.getInputStream(), StandardCharsets.UTF_8).trim();
+					stderr = IOUtils.toString(powerShellProcess.getErrorStream(), StandardCharsets.UTF_8).trim();
+				} catch (IOException e) {
+					popup("Something went wrong while processing this file");
+				    return;
+				}
+				
+				if(!stderr.isEmpty() || stdout.isEmpty() || !stdout.matches("^[0-9a-fA-F]+$")) { 
+					popup("Something went wrong while processing this file");
+				    return;
+				}
+				
+				try {
+					stdout = URLEncoder.encode(":\""+stdout+"\"", StandardCharsets.UTF_8.toString());
+				} catch (UnsupportedEncodingException e1) {
+					popup("Error encounted while submitting data to VT.");
+					e1.printStackTrace();
+				}
+				
+				String url = "https://www.virustotal.com/gui/search/signature"+stdout+"/files" ;
+				OpenBrowser(url);
+				
+			} else { 
+				popup("Sorry, this feature isn't supported on OSes other than windows!");
+			}
+			
+		}
+		
 		private void OpenBrowser(String URL) {
 	        if(Desktop.isDesktopSupported()){
 	            Desktop desktop = Desktop.getDesktop();
@@ -303,6 +368,17 @@ public class VTgrepGHIDRA extends GhidraScript {
 			StrictButton.setName("VTgrep");
 			StrictButton.setHideActionText(true);
 			instructionTablePanel.getTable().getToolbar().add(StrictButton);
+			
+			
+			Icon CertIcon = ResourceManager.getScaledIcon(ResourceManager.loadImage("images/key.png"), 16, 16);
+			Action actionCertCheck = new CertAction("CertCheck", CertIcon, "Find files signed by the same certificate", instructionTablePanel.getTable());
+			
+			
+			EmptyBorderButton CertButton = new EmptyBorderButton();
+			CertButton.setAction(actionCertCheck);
+			CertButton.setName("VTgrep");
+			CertButton.setHideActionText(true);
+			instructionTablePanel.getTable().getToolbar().add(CertButton);
 			
 			
 			JPanel mainPanel = new JPanel();
@@ -400,7 +476,6 @@ public class VTgrepGHIDRA extends GhidraScript {
 						toURL += ((Bytes) curr).get();
 					}
 				}
-				println("DEBUG: inside reduce_query: " + toURL); //TOOD: remove
 			}
 			
 			return reduced_list;
@@ -632,4 +707,3 @@ public class VTgrepGHIDRA extends GhidraScript {
 		
 	}
 }
-
