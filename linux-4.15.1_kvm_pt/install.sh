@@ -1,10 +1,10 @@
 LINUX_VERSION="4.15.1"
 LINUX_URL="https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-$LINUX_VERSION.tar.xz"
-LINUX_MD5="70c4571bfb7ce7ccb14ff43b50165d43"
+LINUX_MD5="544d84b3535c5f821b8bf0e6d22df780"
 
 QEMU_VERSION="2.9.0"
 QEMU_URL="http://download.qemu-project.org/qemu-2.9.0.tar.xz"
-QEMU_MD5="544d84b3535c5f821b8bf0e6d22df780"
+QEMU_MD5="86c95eb3b24ffea3a84a4e3a856b4e26"
 
 echo "================================================="
 echo "                kAFL setup script                "
