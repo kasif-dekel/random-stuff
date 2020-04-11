@@ -1,0 +1,5 @@
+1081a1082,1085
+> #ifdef CONFIG_KVM_VMX_PT
+> 	int (*setup_trace_fd)(struct kvm_vcpu *vcpu);
+> 	int (*vmx_pt_enabled)(void);
+> #endif	

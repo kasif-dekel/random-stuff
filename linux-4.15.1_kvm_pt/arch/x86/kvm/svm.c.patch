@@ -1,0 +1,18 @@
+5426a5427,5436
+> #ifdef CONFIG_KVM_VMX_PT
+> static int setup_trace_fd_stub(struct kvm_vcpu *vcpu){
+> 	return -EINVAL;
+> }
+> static int vmx_pt_is_enabled(void){
+> 	/* AMD CPUs do not support Intel PT */
+> 	return -EINVAL;
+> }
+> #endif
+> 
+5638a5649,5654
+> 
+> #ifdef CONFIG_KVM_VMX_PT
+> 	.setup_trace_fd = setup_trace_fd_stub,
+> 	.vmx_pt_enabled = vmx_pt_is_enabled,
+> #endif	
+> 

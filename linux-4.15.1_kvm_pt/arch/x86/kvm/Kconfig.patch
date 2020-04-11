@@ -1,0 +1,7 @@
+90a91,96
+> config KVM_VMX_PT
+> 	bool "KVM extension for Intel Processor Trace"
+> 	depends on KVM_INTEL
+> 	---help---
+> 	  Provides support for Intel Processor Trace in vmx mode.
+> 

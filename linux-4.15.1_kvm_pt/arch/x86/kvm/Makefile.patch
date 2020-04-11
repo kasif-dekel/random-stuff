@@ -1,0 +1,2 @@
+19a20
+> kvm-intel-$(CONFIG_KVM_VMX_PT) += vmx_pt.o  
